@@ -5,17 +5,38 @@ trait Controller{
 }
 
 class FunctionController(view:View, 
-  doRequest:(HttpRequest)=> Map[String,List[String]]) extends Controller {
-  def handlerRequest(request : HttpRequest) :HttpResponse={
-    var responseCode=200
-    var responseBody=""
+  doRequest:(HttpRequest)=> Map[String,List[String]]) 
+  extends Controller {
+  
+  def handleRequest(request : HttpRequest) :HttpResponse={
     try{
-      var model=doRequest(request)
-      responseBody=view.render(model)
-      
+      val model=doRequest(request)
+      val responseBody=view.render(model)
+      HttpResponse(responseBody,200)
     }catch{
       case e: ControllerException =>
-        responseCode=e.getStatusCode()
+        HttpResponse("",e.getStatusCode())
+      case e: RenderingException =>
+        HttpResponse("Exception while rendering",500)
+      case e: Exception =>
+        HttpResponse("",500)
     }
+    
   }
+  
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
